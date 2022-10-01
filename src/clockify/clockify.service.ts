@@ -73,6 +73,7 @@ export class ClockifyService {
           },
           data: {
             clockifyId: clockifyApproval.creator.userId,
+            status: 'APPROVED',
           },
         });
       }
@@ -96,6 +97,8 @@ export class ClockifyService {
       const totalTime = totals[0].totalTime;
       const totalHours = Math.round((totalTime / 3600) * 100) / 100;
       const convertedTime = this.commonService.convertTime(totalTime);
+      const convertedTimeTemplate =
+        this.commonService.convertTimeTemplate(totalTime);
       const currentMonth = monthNames[date.getMonth()];
       const wage = 5;
       const templateVariables = {
@@ -106,6 +109,14 @@ export class ClockifyService {
         INVOICE_TOTAL: totalHours * wage,
         REIMBURSEMENT: 20,
       };
+      await this.prismaService.teamMember.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          totalTime: convertedTimeTemplate,
+        },
+      });
       let template = `the invoice total is: {{TOTAL_HOURS}} and the converted time is {{TOTAL_TIME}}`;
       const prismaTemplate = await this.prismaService.template.findFirst({
         where: {

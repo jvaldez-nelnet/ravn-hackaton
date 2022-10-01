@@ -103,7 +103,7 @@ export class ClockifyService {
         TOTAL_TIME: convertedTime,
         MONTH: currentMonth,
         WAGE: wage,
-        invoiceTotal: totalHours * wage,
+        INVOICE_TOTAL: totalHours * wage,
       };
       let template = `the invoice total is: {{TOTAL_HOURS}} and the converted time is {{TOTAL_TIME}}`;
       const prismaTemplate = await this.prismaService.template.findFirst({

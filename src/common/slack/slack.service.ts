@@ -25,8 +25,34 @@ export class SlackService {
     }
   }
   async getTeamMembers(access_token: string): Promise<UsersListResponse> {
-    const client = new WebClient(access_token);
-    const users = await client.users.list({ include_locale: true });
-    return users;
+    try {
+      const client = new WebClient(access_token);
+      const users = await client.users.list({ include_locale: true });
+      return users;
+    } catch (e) {
+      throw new BadRequestException('invalid or missing access_token');
+    }
+  }
+  async getTeamMemberByEmail(email) {
+    const client = new WebClient();
+    const user = await client.users.lookupByEmail({
+      email: email,
+      token: process.env.USER_TOKEN,
+    });
+    return user;
+  }
+
+  async sendMessage(userId, message) {
+    try {
+      const client = new WebClient();
+      await client.chat.postMessage({
+        channel: userId,
+        token: process.env.BOT_TOKEN,
+        text: message,
+      });
+    } catch (e) {
+      console.error(e);
+      throw new BadRequestException(`message wasn't send`);
+    }
   }
 }

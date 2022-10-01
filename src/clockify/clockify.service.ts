@@ -1,15 +1,15 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { CommonService } from 'src/common/common.service';
-import { PrismaService } from 'src/common/prisma/prisma.service';
+import { SlackService } from 'src/common/slack/slack.service';
 import { ClockifyApprovalDto } from './dto/clockify-approval.dto';
 
 @Injectable()
 export class ClockifyService {
   constructor(
-    private prismaService: PrismaService,
     private httpService: HttpService,
     private commonService: CommonService,
+    private slackService: SlackService,
   ) {}
 
   receiveApproval = async (clockifyApproval: ClockifyApprovalDto) => {

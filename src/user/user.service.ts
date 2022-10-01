@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { CommonService } from 'src/common/common.service';
 import { PrismaService } from 'src/common/prisma/prisma.service';
+import { SlackService } from 'src/common/slack/slack.service';
 
 @Injectable()
 export class UserService {
@@ -9,6 +10,7 @@ export class UserService {
     private prismaService: PrismaService,
     private httpService: HttpService,
     private commonService: CommonService,
+    private slackService: SlackService,
   ) {}
 
   getAll = async () => {
@@ -53,4 +55,17 @@ export class UserService {
     const users = await this.prismaService.user.findMany();
     return users;
   };
+
+  getSlackUsers(access_token) {
+    return this.slackService.getTeamMembers(access_token);
+  }
+
+  getByUserEmail(email) {
+    return this.slackService.getTeamMemberByEmail(email);
+  }
+
+  async sendMessageToUser(body) {
+    await this.slackService.sendMessage(body.userId, body.message);
+    return 'message sent';
+  }
 }

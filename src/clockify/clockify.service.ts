@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CommonService } from 'src/common/common.service';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { SlackService } from 'src/common/slack/slack.service';
@@ -94,6 +94,10 @@ export class ClockifyService {
       const {
         data: { totals },
       } = report;
+      if (!totals) {
+        console.error(`the user entries doesn't match for the month`);
+        throw new BadRequestException();
+      }
       const totalTime = totals[0].totalTime;
       const totalHours = Math.round((totalTime / 3600) * 100) / 100;
       const convertedTime = this.commonService.convertTime(totalTime);

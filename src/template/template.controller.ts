@@ -13,4 +13,9 @@ export class TemplateController {
   async getAll() {
     return this.templateService.getAll();
   }
+
+  @Get('variables')
+  async getVariables() {
+    return this.templateService.getTemplateVariables();
+  }
 }

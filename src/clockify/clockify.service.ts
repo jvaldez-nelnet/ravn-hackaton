@@ -16,18 +16,18 @@ export class ClockifyService {
 
   receiveApproval = async (clockifyApproval: ClockifyApprovalDto) => {
     const monthNames = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre',
     ];
     const baseURL = 'https://reports.api.clockify.me/v1';
     if (clockifyApproval.status.state === 'APPROVED') {

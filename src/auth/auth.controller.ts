@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -10,7 +10,7 @@ export class AuthController {
   }
 
   @Get('redirect')
-  async getToken(@Param() code) {
+  async getToken(@Query('code') code) {
     return this.authService.getOpenIdToken(code);
   }
 }

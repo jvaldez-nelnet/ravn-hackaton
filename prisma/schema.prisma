@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Roles {
+  DEVELOPER
+  DESIGNER
+}
+
 model User {
   id               Int      @id @default(autoincrement())
   uuid             String   @unique @default(uuid()) @db.Uuid
@@ -39,6 +44,9 @@ model TeamMember {
   clockifyId String?
   createdAt  DateTime @default(now()) @map(name: "created_at")
   updatedAt  DateTime @updatedAt @map(name: "updated_at")
+  wage       Int      @default(3)
+  totalTime  String?
+  role       Roles    @default(DEVELOPER)
 
   @@map("team_members")
 }

@@ -11,15 +11,22 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  uuid      String   @unique @default(uuid()) @db.Uuid
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  id               Int      @id @default(autoincrement())
+  uuid             String   @unique @default(uuid()) @db.Uuid
+  name             String
+  email            String   @unique
+  password         String?
+  slackAccessToken String?  @map("slack_access_token")
+  createdAt        DateTime @default(now()) @map(name: "created_at")
+  updatedAt        DateTime @updatedAt @map(name: "updated_at")
 
   @@map("users")
+}
+
+enum Country {
+  USA
+  SV
+  PE
 }
 
 model TeamMember {
@@ -27,8 +34,9 @@ model TeamMember {
   uuid       String   @unique @default(uuid()) @db.Uuid
   name       String
   email      String   @unique
-  slackId    String
-  clockifyId String
+  country    Country
+  slackId    String?
+  clockifyId String?
   createdAt  DateTime @default(now()) @map(name: "created_at")
   updatedAt  DateTime @updatedAt @map(name: "updated_at")
 

@@ -15,6 +15,20 @@ export class ClockifyService {
   ) {}
 
   receiveApproval = async (clockifyApproval: ClockifyApprovalDto) => {
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
     const baseURL = 'https://reports.api.clockify.me/v1';
     if (clockifyApproval.status.state === 'APPROVED') {
       // verify the date the approvals was made
@@ -80,12 +94,35 @@ export class ClockifyService {
         data: { totals },
       } = report;
       const totalTime = totals[0].totalTime;
-      const invoiceTotal = Math.round((totalTime / 3600) * 100) / 100;
+      const totalHours = Math.round((totalTime / 3600) * 100) / 100;
       const convertedTime = this.commonService.convertTime(totalTime);
-      const result = `the invoice total is: ${invoiceTotal} and the converted time is ${convertedTime}`;
-      await this.slackService.sendMessage(user.slackId, result);
-      console.log(result);
-      return result;
+      const currentMonth = monthNames[date.getMonth()];
+      const wage = 5;
+      const templateVariables = {
+        TOTAL_HOURS: totalHours,
+        TOTAL_TIME: convertedTime,
+        MONTH: currentMonth,
+        WAGE: wage,
+        invoiceTotal: totalHours * wage,
+      };
+      let template = `the invoice total is: {{TOTAL_HOURS}} and the converted time is {{TOTAL_TIME}}`;
+      const prismaTemplate = await this.prismaService.template.findFirst({
+        where: {
+          location: user.country,
+        },
+      });
+      if (template) {
+        template = prismaTemplate.template;
+      }
+
+      for (const [key, value] of Object.entries(templateVariables)) {
+        template.replace(`{{${key}}}`, value as string);
+      }
+
+      // const result = `the invoice total is: ${totalHours} and the converted time is ${convertedTime}`;
+      await this.slackService.sendMessage(user.slackId, template);
+      console.log(template);
+      return template;
     }
     // console.log(clockifyApproval);
   };

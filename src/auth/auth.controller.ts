@@ -17,7 +17,7 @@ export class AuthController {
     };
   }
 
-  @Get('openId')
+  @Get('open-id')
   async getOpenIdToken(@Body() body) {
     return this.authService.getOpenIdToken(body.code);
   }

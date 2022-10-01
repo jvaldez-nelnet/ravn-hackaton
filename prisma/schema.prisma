@@ -42,3 +42,11 @@ model TeamMember {
 
   @@map("team_members")
 }
+
+model Template {
+  id          Int     @id @default(autoincrement())
+  uuid        String  @unique @default(uuid()) @db.Uuid
+  template    String
+  location    Country @default(PE)
+  description String?
+}

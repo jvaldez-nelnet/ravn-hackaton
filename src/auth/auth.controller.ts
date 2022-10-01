@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Query, Redirect } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -9,8 +9,16 @@ export class AuthController {
     return this.authService.getUrl();
   }
 
+  @Redirect(process.env.FRONTEND_URL, 301)
   @Get('redirect')
   async getToken(@Query('code') code) {
-    return this.authService.getOpenIdToken(code);
+    return {
+      url: `${process.env.FRONTEND_URL}?code=${code}`,
+    };
+  }
+
+  @Get('openId')
+  async getOpenIdToken(@Body() body) {
+    return this.authService.getOpenIdToken(body.code);
   }
 }

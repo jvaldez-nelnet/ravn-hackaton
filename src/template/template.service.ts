@@ -14,12 +14,12 @@ export class TemplateService {
 
   getTemplateVariables = async () => {
     return {
-      TOTAL_HOURS: 'TOTAL_HOURS',
-      TOTAL_TIME: 'TOTAL_TIME',
-      MONTH: 'MONTH',
-      WAGE: 'WAGE',
-      INVOICE_TOTAL: 'INVOICE_TOTAL',
-      REIMBURSEMENT: 'REIMBURSEMENT',
+      TOTAL_HOURS: '{{TOTAL_HOURS}}',
+      TOTAL_TIME: '{{TOTAL_TIME}}',
+      MONTH: '{{MONTH}}',
+      WAGE: '{{WAGE}}',
+      INVOICE_TOTAL: '{{INVOICE_TOTAL}}',
+      REIMBURSEMENT: '{{REIMBURSEMENT}}',
     };
   };
 }

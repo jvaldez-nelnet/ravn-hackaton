@@ -46,6 +46,9 @@ export class ClockifyService {
       });
 
       if (!user) {
+        console.error(
+          `there is no user with email ${clockifyApproval.creator.userEmail}`,
+        );
         return;
       }
 

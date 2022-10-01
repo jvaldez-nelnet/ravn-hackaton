@@ -8,10 +8,12 @@ import { ClockifyModule } from './clockify/clockify.module';
 import { HttpModule } from '@nestjs/axios';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
+import { TeamMemberController } from './team-member/team-member.controller';
+import { TeamMemberService } from './team-member/team-member.service';
 
 @Module({
   imports: [CommonModule, ClockifyModule, HttpModule],
-  controllers: [AppController, UserController, AuthController],
-  providers: [AppService, UserService, AuthService],
+  controllers: [AppController, UserController, AuthController, TeamMemberController],
+  providers: [AppService, UserService, AuthService, TeamMemberService],
 })
 export class AppModule {}

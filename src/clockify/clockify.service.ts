@@ -26,7 +26,7 @@ export class ClockifyService {
         dateRangeStart: startDate,
         dateRangeEnd: endDate,
         summaryFilter: {
-          groups: ['USER'],
+          groups: ['MONTH'],
         },
         exportType: 'JSON',
         users: {

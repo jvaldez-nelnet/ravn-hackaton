@@ -100,13 +100,12 @@ export class ClockifyService {
       const convertedTimeTemplate =
         this.commonService.convertTimeTemplate(totalTime);
       const currentMonth = monthNames[date.getMonth()];
-      const wage = 5;
       const templateVariables = {
         TOTAL_HOURS: totalHours,
         TOTAL_TIME: convertedTime,
         MONTH: currentMonth,
-        WAGE: wage,
-        INVOICE_TOTAL: totalHours * wage,
+        WAGE: user.wage,
+        INVOICE_TOTAL: totalHours * user.wage,
         REIMBURSEMENT: 20,
       };
       await this.prismaService.teamMember.update({

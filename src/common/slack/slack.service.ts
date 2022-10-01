@@ -15,7 +15,7 @@ export class SlackService {
   }
 
   async importTeamMembers() {
-    const client = new WebClient();
+    // const client = new WebClient();
     const users = await this.getTeamMembers(process.env.USER_TOKEN);
     const teamMembersFilter = users.members.filter(
       (member) =>
@@ -29,21 +29,21 @@ export class SlackService {
           },
         });
         if (userFound) return userFound;
-        const user = await client.users.profile.get({
-          user: member.id,
-          token: process.env.USER_TOKEN,
-          include_labels: true,
-        });
+        // const user = await client.users.profile.get({
+        //   user: member.id,
+        //   token: process.env.USER_TOKEN,
+        //   include_labels: true,
+        // });
         let country = 'PE';
-        if (user.profile.fields) {
-          for (const [, value] of Object.entries(user.profile.fields)) {
+        if (member.profile.fields) {
+          for (const [, value] of Object.entries(member.profile.fields)) {
             if (value.label === 'Country') country = value.value;
           }
         }
         return this.prismaService.teamMember.create({
           data: {
-            email: user.profile.email,
-            name: user.profile.display_name,
+            email: member.profile.email,
+            name: member.profile.display_name,
             country: Country[country],
             slackId: member.id,
           },

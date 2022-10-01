@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { CommonService } from 'src/common/common.service';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { SlackService } from 'src/common/slack/slack.service';
 import { ClockifyApprovalDto } from './dto/clockify-approval.dto';
 
@@ -10,6 +11,7 @@ export class ClockifyService {
     private httpService: HttpService,
     private commonService: CommonService,
     private slackService: SlackService,
+    private prismaService: PrismaService,
   ) {}
 
   receiveApproval = async (clockifyApproval: ClockifyApprovalDto) => {
@@ -30,11 +32,33 @@ export class ClockifyService {
         },
         exportType: 'JSON',
         users: {
-          ids: [clockifyApproval.owner.userId],
+          ids: [clockifyApproval.creator.userId],
           contains: 'CONTAINS',
           status: 'ALL',
         },
       };
+
+      // match with the corresponding user if exists in the database
+      const user = await this.prismaService.teamMember.findUnique({
+        where: {
+          email: clockifyApproval.creator.userEmail,
+        },
+      });
+
+      if (!user) {
+        return;
+      }
+
+      if (user && !user.clockifyId) {
+        await this.prismaService.teamMember.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            clockifyId: clockifyApproval.creator.userId,
+          },
+        });
+      }
 
       const report = await this.httpService
         .post(
@@ -56,6 +80,7 @@ export class ClockifyService {
       const invoiceTotal = Math.round((totalTime / 3600) * 100) / 100;
       const convertedTime = this.commonService.convertTime(totalTime);
       const result = `the invoice total is: ${invoiceTotal} and the converted time is ${convertedTime}`;
+      await this.slackService.sendMessage(user.slackId, result);
       console.log(result);
       return result;
     }

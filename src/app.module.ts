@@ -6,10 +6,12 @@ import { UserService } from './user/user.service';
 import { CommonModule } from './common/common.module';
 import { ClockifyModule } from './clockify/clockify.module';
 import { HttpModule } from '@nestjs/axios';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
 
 @Module({
   imports: [CommonModule, ClockifyModule, HttpModule],
-  controllers: [AppController, UserController],
-  providers: [AppService, UserService],
+  controllers: [AppController, UserController, AuthController],
+  providers: [AppService, UserService, AuthService],
 })
 export class AppModule {}

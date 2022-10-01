@@ -11,7 +11,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class SlackService {
   constructor(private prismaService: PrismaService) {}
   getUrl() {
-    return `https://slack.com/openid/connect/authorize?scope=openid%20email;response_type=code;redirect_uri=${process.env.REDIRECT_URI};client_id=${process.env.CLIENT_ID}`;
+    return `https://slack.com/openid/connect/authorize?scope=openid%20email&response_type=code&redirect_uri=${process.env.REDIRECT_URI}&client_id=${process.env.CLIENT_ID}`;
   }
 
   async importTeamMembers() {

@@ -34,6 +34,12 @@ enum Country {
   PE
 }
 
+enum Status {
+  APPROVED
+  PENDING
+  REJECTED
+}
+
 model TeamMember {
   id         Int      @id @default(autoincrement())
   uuid       String   @unique @default(uuid()) @db.Uuid
@@ -47,6 +53,7 @@ model TeamMember {
   wage       Int      @default(3)
   totalTime  String?
   role       Roles    @default(DEVELOPER)
+  status     Status   @default(PENDING)
 
   @@map("team_members")
 }

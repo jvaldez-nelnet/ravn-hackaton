@@ -117,7 +117,7 @@ export class ClockifyService {
       }
 
       for (const [key, value] of Object.entries(templateVariables)) {
-        template.replace(`{{${key}}}`, value as string);
+        template = template.replace(`{{${key}}}`, value as string);
       }
 
       // const result = `the invoice total is: ${totalHours} and the converted time is ${convertedTime}`;

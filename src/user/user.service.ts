@@ -6,6 +6,7 @@ export class UserService {
   constructor(private prismaService: PrismaService) {}
 
   getAll = async () => {
-    return 'hola causita';
+    const users = await this.prismaService.user.findMany();
+    return users;
   };
 }

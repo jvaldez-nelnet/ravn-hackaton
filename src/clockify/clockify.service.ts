@@ -55,9 +55,9 @@ export class ClockifyService {
       const totalTime = totals[0].totalTime;
       const invoiceTotal = Math.round((totalTime / 3600) * 100) / 100;
       const convertedTime = this.commonService.convertTime(totalTime);
-      console.log(
-        `the invoice total is: ${invoiceTotal} and the converted time is ${convertedTime}`,
-      );
+      const result = `the invoice total is: ${invoiceTotal} and the converted time is ${convertedTime}`;
+      console.log(result);
+      return result;
     }
     // console.log(clockifyApproval);
   };

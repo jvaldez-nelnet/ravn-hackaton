@@ -8,6 +8,25 @@ export class TemplateService {
     return this.prismaService.template.create({ data: template });
   };
 
+  modifyTemplate = async (template, uuid) => {
+    return this.prismaService.template.update({
+      where: {
+        uuid,
+      },
+      data: {
+        ...template,
+      },
+    });
+  };
+
+  deleteTemplate(uuid) {
+    return this.prismaService.template.delete({ where: { uuid } });
+  }
+
+  getOne(uuid) {
+    return this.prismaService.template.findUnique({ where: { uuid } });
+  }
+
   getAll = async () => {
     return this.prismaService.template.findMany();
   };

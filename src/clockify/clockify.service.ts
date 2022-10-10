@@ -17,33 +17,15 @@ export class ClockifyService {
 
   receiveApproval = async (clockifyApproval: ClockifyApprovalDto) => {
     const baseURL = 'https://reports.api.clockify.me/v1';
-    console.log(clockifyApproval);
     if (clockifyApproval.status.state === 'APPROVED') {
       // verify the date the approvals was made
       const approvalDate = moment(clockifyApproval.status.updatedAt);
-      const firstDayApproval = moment(approvalDate).startOf('month');
-      const forthDayApproval = moment(firstDayApproval).add(5, 'day');
-      if (!approvalDate.isBetween(firstDayApproval, forthDayApproval)) {
-        // is not the first approval
-        return;
-      }
-      const date = moment(approvalDate).subtract(1, 'month');
-      const startDate = date.startOf('month').toISOString();
-      const endDate = date.endOf('month').toISOString();
-      const monthName = date.locale('es').format('MMMM').toUpperCase();
-      const options = {
-        dateRangeStart: startDate,
-        dateRangeEnd: endDate,
-        summaryFilter: {
-          groups: ['MONTH'],
-        },
-        exportType: 'JSON',
-        users: {
-          ids: [clockifyApproval.creator.userId],
-          contains: 'CONTAINS',
-          status: 'ALL',
-        },
-      };
+      // const firstDayApproval = moment(approvalDate).startOf('month');
+      // const forthDayApproval = moment(firstDayApproval).add(4, 'days');
+      // if (!approvalDate.isBetween(firstDayApproval, forthDayApproval)) {
+      // is not the first approval
+      // return;
+      // }
 
       // match with the corresponding user if exists in the database
       const user = await this.prismaService.teamMember.findUnique({
@@ -71,6 +53,25 @@ export class ClockifyService {
         });
       }
 
+      const date = moment(approvalDate).subtract(1, 'month');
+      const startDate = date.startOf('month').toISOString();
+      const endDate = date.endOf('month').toISOString();
+      const monthName = date.locale('es').format('MMMM').toUpperCase();
+
+      const options = {
+        dateRangeStart: startDate,
+        dateRangeEnd: endDate,
+        summaryFilter: {
+          groups: ['MONTH'],
+        },
+        exportType: 'JSON',
+        users: {
+          ids: [clockifyApproval.creator.userId],
+          contains: 'CONTAINS',
+          status: 'ALL',
+        },
+      };
+
       const report = await this.httpService
         .post(
           baseURL +
@@ -91,7 +92,7 @@ export class ClockifyService {
         console.error(`the user entries doesn't match for the month`);
         throw new BadRequestException();
       }
-      const totalTime = totals[0].totalTime;
+      const totalTime = totals[0].totalTime; // time in miliseconds
       const totalHours = Math.round((totalTime / 3600) * 100) / 100;
       const convertedTime = this.commonService.convertTime(totalTime);
       const convertedTimeTemplate =
@@ -126,14 +127,36 @@ export class ClockifyService {
         template = template.replace(`{{${key}}}`, value as string);
       }
 
-      // const result = `the invoice total is: ${totalHours} and the converted time is ${convertedTime}`;
       await this.slackService.sendMessage(user.slackId, template);
-      console.log(template);
+      await this.slackService.sendMessage(
+        user.slackId,
+        `Your total invoice is: ${templateVariables.INVOICE_TOTAL}`,
+      );
       return template;
-    } else {
-      console.log('the approval is: ');
-      console.log(clockifyApproval);
+    } else if (clockifyApproval.status.state === 'PENDING') {
+      // update the approval state for the teamMember
+      const approvalDate = moment(clockifyApproval.status.updatedAt);
+      const firstDayApproval = moment(approvalDate).startOf('month');
+      const forthDayApproval = moment(firstDayApproval).add(4, 'days');
+      if (!approvalDate.isBetween(firstDayApproval, forthDayApproval)) {
+        // is not the first approval
+        return;
+      }
+      const teamMember = await this.prismaService.teamMember.update({
+        where: {
+          email: clockifyApproval.creator.userEmail,
+        },
+        data: {
+          clockifyId: clockifyApproval.creator.userId,
+          status: 'PENDING',
+        },
+      });
+      if (!teamMember) {
+        console.error(
+          `there is no user with email ${clockifyApproval.creator.userEmail}`,
+        );
+        return;
+      }
     }
-    // console.log(clockifyApproval);
   };
 }

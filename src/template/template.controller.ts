@@ -17,6 +17,11 @@ export class TemplateController {
     return this.templateService.createTemplate(template);
   }
 
+  @Get('variables')
+  async getVariables() {
+    return this.templateService.getTemplateVariables();
+  }
+
   @Put(':uuid')
   async updateTemplate(@Body() template, @Param('uuid') uuid) {
     return this.templateService.modifyTemplate(template, uuid);
@@ -35,10 +40,5 @@ export class TemplateController {
   @Get()
   async getAll() {
     return this.templateService.getAll();
-  }
-
-  @Get('variables')
-  async getVariables() {
-    return this.templateService.getTemplateVariables();
   }
 }

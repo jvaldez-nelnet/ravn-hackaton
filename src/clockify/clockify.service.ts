@@ -72,6 +72,8 @@ export class ClockifyService {
         },
       };
 
+      // TODO: verify if is the first approval of the month
+
       const report = await this.httpService
         .post(
           baseURL +
@@ -127,6 +129,7 @@ export class ClockifyService {
         template = template.replace(`{{${key}}}`, value as string);
       }
 
+      // TODO: don't send the mesage if is not the monthly approval
       await this.slackService.sendMessage(user.slackId, template);
       await this.slackService.sendMessage(
         user.slackId,

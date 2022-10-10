@@ -17,6 +17,7 @@ export class ClockifyService {
 
   receiveApproval = async (clockifyApproval: ClockifyApprovalDto) => {
     const baseURL = 'https://reports.api.clockify.me/v1';
+    console.log(clockifyApproval);
     if (clockifyApproval.status.state === 'APPROVED') {
       // verify the date the approvals was made
       const approvalDate = moment(clockifyApproval.status.updatedAt);

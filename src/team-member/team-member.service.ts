@@ -16,4 +16,31 @@ export class TeamMemberService {
   getAll = async () => {
     return this.prismaService.teamMember.findMany();
   };
+
+  updateTeamMember = async (uuid, teamMember) => {
+    return this.prismaService.teamMember.update({
+      where: {
+        uuid,
+      },
+      data: {
+        ...teamMember,
+      },
+    });
+  };
+
+  deleteTeamMember = async (uuid) => {
+    return this.prismaService.teamMember.delete({
+      where: {
+        uuid,
+      },
+    });
+  };
+
+  getOne = async (uuid) => {
+    return this.prismaService.teamMember.findUnique({
+      where: {
+        uuid,
+      },
+    });
+  };
 }

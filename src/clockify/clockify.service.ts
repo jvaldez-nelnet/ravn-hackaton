@@ -4,6 +4,7 @@ import { CommonService } from 'src/common/common.service';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { SlackService } from 'src/common/slack/slack.service';
 import { ClockifyApprovalDto } from './dto/clockify-approval.dto';
+import * as moment from 'moment';
 
 @Injectable()
 export class ClockifyService {
@@ -15,29 +16,20 @@ export class ClockifyService {
   ) {}
 
   receiveApproval = async (clockifyApproval: ClockifyApprovalDto) => {
-    const monthNames = [
-      'Enero',
-      'Febrero',
-      'Marzo',
-      'Abril',
-      'Mayo',
-      'Junio',
-      'Julio',
-      'Agosto',
-      'Septiembre',
-      'Octubre',
-      'Noviembre',
-      'Diciembre',
-    ];
     const baseURL = 'https://reports.api.clockify.me/v1';
     if (clockifyApproval.status.state === 'APPROVED') {
       // verify the date the approvals was made
-      const date = new Date(clockifyApproval.status.updatedAt);
-      date.setMonth(date.getMonth() - 1);
-      const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-      const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-      const startDate = firstDay.toISOString().split('T')[0] + 'T00:00:00.000';
-      const endDate = lastDay.toISOString().split('T')[0] + 'T23:59:59.000';
+      const approvalDate = moment(clockifyApproval.status.updatedAt);
+      const firstDayApproval = moment(approvalDate).startOf('month');
+      const forthDayApproval = moment(firstDayApproval).add(5, 'day');
+      if (!approvalDate.isBetween(firstDayApproval, forthDayApproval)) {
+        // is not the first approval
+        return;
+      }
+      const date = moment(approvalDate).subtract(1, 'month');
+      const startDate = date.startOf('month').toISOString();
+      const endDate = date.endOf('month').toISOString();
+      const monthName = date.locale('es').format('MMMM').toUpperCase();
       const options = {
         dateRangeStart: startDate,
         dateRangeEnd: endDate,
@@ -103,11 +95,10 @@ export class ClockifyService {
       const convertedTime = this.commonService.convertTime(totalTime);
       const convertedTimeTemplate =
         this.commonService.convertTimeTemplate(totalTime);
-      const currentMonth = monthNames[date.getMonth()];
       const templateVariables = {
         TOTAL_HOURS: totalHours,
         TOTAL_TIME: convertedTime,
-        MONTH: currentMonth,
+        MONTH: monthName,
         WAGE: user.wage,
         INVOICE_TOTAL: totalHours * user.wage,
         REIMBURSEMENT: 20,
@@ -138,6 +129,9 @@ export class ClockifyService {
       await this.slackService.sendMessage(user.slackId, template);
       console.log(template);
       return template;
+    } else {
+      console.log('the approval is: ');
+      console.log(clockifyApproval);
     }
     // console.log(clockifyApproval);
   };
